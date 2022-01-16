@@ -1,0 +1,33 @@
+syntax = "proto3";
+
+//protoc --go_out=plugins=grpc:./ ./both_stream.proto
+
+// 定义流式请求信息
+message StreamRequest{
+    //流请求参数
+    string question = 1;
+}
+
+// 定义流式响应信息
+message StreamResponse{
+    //流响应数据
+    string answer = 1;
+}
+
+// 定义响应信息
+message SimpleResponse{
+    //响应码
+    int32 code = 1;
+    //响应值
+    string value = 2;
+}
+
+service Stream{
+    // 双向流式rpc，同时在请求参数前和响应参数前加上stream
+    rpc Conversations(stream StreamRequest) returns(stream StreamResponse){};
+    // 单向流式rpc，在请求参数前加上stream，客户端流式RPC
+    // 客户端不断的向服务端发送数据流，而在发送结束后，由服务端返回一个响应。
+    // 情景模拟：客户端大量数据上传到服务端
+    // https://bingjian-zhu.github.io/2020/04/14/Go-gRPC%E6%95%99%E7%A8%8B-%E5%AE%A2%E6%88%B7%E7%AB%AF%E6%B5%81%E5%BC%8FRPC%EF%BC%88%E5%9B%9B%EF%BC%89/
+    rpc UploadData(stream StreamRequest) returns(stream StreamResponse){};
+}
